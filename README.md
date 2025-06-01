@@ -1,69 +1,119 @@
 # GraphQL API Guide
 
-This guide provides instructions on how to use the GraphQL API for managing books.
+This guide provides instructions on how to use the GraphQL API for managing books and their authors.
 
-## Setup
+---
 
-1. **Generate GraphQL Code**
-   
-   Run the following command to generate the necessary GraphQL code:
-   
+## 🔧 Setup
+
+1. **Install dependencies and generate GraphQL code**
+
    ```bash
+   go mod tidy
    gqlgen generate
    ```
 
-2. **Access the GraphQL Console**
+2. **Run the server**
 
-   Open your browser and go to the following URL to access the GraphQL console:
-   
-   [http://localhost:8080](http://localhost:8080)
+   ```bash
+   go run .
+   ```
 
-## Queries and Mutations
+3. **Open the GraphQL Console**
 
-### Query: Fetch Books
+   In your browser, go to: [http://localhost:8080](http://localhost:8080)
 
-To fetch the list of books, run the following query:
+---
+
+## 🚀 What This App Demonstrates
+
+This project demonstrates how **GraphQL solves the underfetching problem**.
+
+### ❌ Underfetching in REST:
+To show a book and its author, REST clients often need to:
+- First call `/books` → get `author_id`
+- Then call `/authors/{id}` for each book → multiple round-trips
+
+### ✅ In GraphQL:
+You can make **a single query** like this:
+
+```graphql
+query {
+  books {
+    title
+    author {
+      name
+    }
+  }
+}
+```
+
+And GraphQL will:
+- Fetch all books
+- Automatically call a resolver to fetch each `author`
+- Combine it all into a single structured response
+
+---
+
+## 📚 GraphQL Queries and Mutations
+
+### 🔍 Query: Fetch Books with Author Info
 
 ```graphql
 query {
   books {
     id
     title
-    author
+    author {
+      id
+      name
+    }
   }
 }
 ```
 
-### Mutation: Add a Book
-
-To add a new book, use the following mutation:
+### ➕ Mutation: Add a Book (linked to existing author)
 
 ```graphql
 mutation {
-  addBook(title: "GraphQL in Action", author: "Samer Buna") {
+  addBook(title: "GraphQL in Action", authorID: "1") {
     id
     title
-    author
+    author {
+      name
+    }
   }
 }
 ```
 
-## Using cURL
+---
 
-You can also perform the above operations using cURL commands:
+## 📟 Using cURL
 
-### Fetch Books
+### 🔍 Fetch Books with Author Info
 
 ```bash
 curl -X POST http://localhost:8080/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query": "query { books { id title author } }"}'
+  -d '{"query": "query { books { id title author { id name } } }"}'
 ```
 
-### Add a Book
+### ➕ Add a Book
 
 ```bash
 curl -X POST http://localhost:8080/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query": "mutation { addBook(title: \\"GraphQL in Action\\", author: \\"Samer Buna\\") { id title author } }"}'
-``` 
+  -d '{"query": "mutation { addBook(title: \"GraphQL in Action\", authorID: \"1\") { id title author { name } } }"}'
+```
+
+---
+
+## 📌 Notes
+
+- Authors are predefined in-memory (e.g., `"1"` = Robert C. Martin)
+- The `author` field is resolved separately using `@goField(forceResolver: true)`
+- This approach demonstrates **how GraphQL handles nested data fetching seamlessly**
+
+---
+
+Happy querying! 🎯

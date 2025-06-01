@@ -1,13 +1,20 @@
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+type Author {
+    id: ID!
+    name: String!
+}
+
 type Book {
-  id: ID!
-  title: String!
-  author: String!
+    id: ID!
+    title: String!
+    author: Author! @goField(forceResolver: true)
 }
 
 type Query {
-  books: [Book!]!
+    books: [Book!]!
 }
 
 type Mutation {
-  addBook(title: String!, author: String!): Book!
+    addBook(title: String!, authorID: ID!): Book!
 }
