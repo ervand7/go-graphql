@@ -256,28 +256,23 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "../schema.graphqls", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
-#------------- новые типы -------------
 type Author {
-  id: ID!
-  name: String!
+    id: ID!
+    name: String!
 }
 
 type Book {
-  id: ID!
-  title: String!
-  author: Author! @goField(forceResolver: true)  # <---
+    id: ID!
+    title: String!
+    author: Author! @goField(forceResolver: true)
 }
 
-
-#------------- API --------------------
 type Query {
-  books: [Book!]!
+    books: [Book!]!
 }
 
 type Mutation {
-  # теперь Mutation принимает authorID,
-  # а не строку-имя автора — так понятнее связь
-  addBook(title: String!, authorID: ID!): Book!
+    addBook(title: String!, authorID: ID!): Book!
 }
 `, BuiltIn: false},
 }

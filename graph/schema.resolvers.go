@@ -18,13 +18,16 @@ import (
 func (r *bookResolver) Author(ctx context.Context, obj *model.Book) (*model.Author, error) {
 	// Find the inner book to find out its authorID
 	var authorID string
-	for _, bk := range books {
+	for _, bk := range r.books {
 		if bk.ID == obj.ID {
 			authorID = bk.AuthorID
 			break
 		}
 	}
-	a, ok := authors[authorID]
+	if authorID == "" {
+		return nil, fmt.Errorf("book %s not found", obj.ID)
+	}
+	a, ok := r.authors[authorID]
 	if !ok {
 		return nil, fmt.Errorf("author %s not found", authorID)
 	}
